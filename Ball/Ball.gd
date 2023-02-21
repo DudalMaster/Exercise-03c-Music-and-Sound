@@ -14,8 +14,6 @@ var decay_wobble = 0.15
 
 export var distort_effect = 0.0002
 
-var h_rotate = 0.0
-
 func _ready():
 	contact_monitor = true
 	contacts_reported = 8
@@ -36,12 +34,11 @@ func _on_Ball_body_entered(body):
 		$Tween.start()
 		wobble_direction = linear_velocity.tangent().normalized()
 		wobble_amplitude = wobble_max
-	
-	
+
+
 func _integrate_forces(state):
 	wobble()
 	distort()
-	comet()
 	if position.y > Global.VP.y + 100:
 		die()
 	if accelerate:
@@ -54,6 +51,11 @@ func _integrate_forces(state):
 	if state.linear_velocity.length() > max_speed:
 		state.linear_velocity = state.linear_velocity.normalized() * max_speed
 
+func die():
+	var die_sound = get_node_or_null("/root/Game/Die_Sound")
+	if die_sound != null:
+		die_sound.play()
+	queue_free()
 
 func wobble():
 	wobble_period += 1
@@ -66,9 +68,4 @@ func distort():
 	var direction = Vector2(1 + linear_velocity.length() * distort_effect, 1 - linear_velocity.length() * distort_effect)
 	$Images.rotation = linear_velocity.angle()
 	$Images.scale = direction
-	
-func comet():
-	pass
 
-func die():
-	queue_free()
